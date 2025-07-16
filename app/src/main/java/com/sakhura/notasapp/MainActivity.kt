@@ -1,62 +1,65 @@
-package com.sakhura.notasapp
+package com.sakhura.notasapp.data
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.sakhura.notasapp.adapter.NotasAdapter
-import com.sakhura.notasapp.data.NotasManager
-import com.sakhura.notasapp.databinding.ActivityMainBinding
+import android.util.Log
 import com.sakhura.notasapp.model.Nota
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: NotasAdapter
+object NotasManager {
+    // Lista de notas en memoria
+    private val notas = mutableListOf(
+        Nota(System.currentTimeMillis(), "Nota de ejemplo", "Este es el contenido de prueba.")
+    )
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // Inicializa el adapter con lambda de clic
-        adapter = NotasAdapter { nota ->
-            val intent = Intent(this, DetalleNotaActivity::class.java)
-            intent.putExtra("nota_id", nota.id)
-            startActivity(intent)
-        }
-
-        // Configura RecyclerView
-        binding.rvNotas.layoutManager = LinearLayoutManager(this)
-        binding.rvNotas.adapter = adapter
-
-        // Botón flotante para crear nueva nota - CORREGIDO
-        binding.fabAgregarNota.setOnClickListener {
-            val nuevaNotaId = System.currentTimeMillis()
-            val nuevaNota = Nota(nuevaNotaId, "", "")
-
-            // Guardar la nota temporal en el manager
-            NotasManager.agregarNota(nuevaNota)
-
-            val intent = Intent(this, DetalleNotaActivity::class.java)
-            intent.putExtra("nota_id", nuevaNota.id)
-            startActivity(intent)
-        }
-
-        // Configura búsqueda de notas por título
-        binding.searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                val filtradas = NotasManager.buscarNotas(newText.orEmpty())
-                adapter.actualizarNotas(filtradas)
-                return true
-            }
-        })
+    init {
+        Log.d("NotasManager", "NotasManager inicializado con ${notas.size} notas")
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Refresca la lista al volver del detalle
-        adapter.actualizarNotas(NotasManager.obtenerNotas())
+    // Obtener todas las notas ordenadas por fecha (más recientes primero)
+    fun obtenerNotas(): List<Nota> {
+        val resultado = notas.sortedByDescending { it.fechaCreacion }
+        Log.d("NotasManager", "obtenerNotas() - Devolviendo ${resultado.size} notas")
+        return resultado
+    }
+
+    // Agregar una nueva nota
+    fun agregarNota(nota: Nota) {
+        notas.add(nota)
+        Log.d("NotasManager", "agregarNota() - Nota agregada con ID: ${nota.id}. Total notas: ${notas.size}")
+    }
+
+    // Eliminar una nota por ID
+    fun eliminarNota(id: Long) {
+        val sizeBefore = notas.size
+        notas.removeIf { it.id == id }
+        val sizeAfter = notas.size
+        Log.d("NotasManager", "eliminarNota($id) - Notas antes: $sizeBefore, después: $sizeAfter")
+    }
+
+    // Buscar notas por título (ignorando mayúsculas)
+    fun buscarNotas(query: String): List<Nota> {
+        val resultado = notas.filter {
+            it.titulo.contains(query, ignoreCase = true) ||
+                    it.contenido.contains(query, ignoreCase = true)
+        }.sortedByDescending { it.fechaCreacion }
+
+        Log.d("NotasManager", "buscarNotas('$query') - Encontradas ${resultado.size} notas")
+        return resultado
+    }
+
+    // Obtener una nota específica por su ID
+    fun obtenerNotaPorId(id: Long): Nota? {
+        val resultado = notas.find { it.id == id }
+        Log.d("NotasManager", "obtenerNotaPorId($id) - ${if (resultado != null) "Encontrada" else "NO encontrada"}")
+        return resultado
+    }
+
+    // Actualizar una nota existente
+    fun actualizarNota(nuevaNota: Nota) {
+        val index = notas.indexOfFirst { it.id == nuevaNota.id }
+        if (index != -1) {
+            notas[index] = nuevaNota
+            Log.d("NotasManager", "actualizarNota() - Nota actualizada en índice $index con ID: ${nuevaNota.id}")
+        } else {
+            Log.e("NotasManager", "actualizarNota() - ERROR: No se encontró nota con ID: ${nuevaNota.id}")
+        }
     }
 }
