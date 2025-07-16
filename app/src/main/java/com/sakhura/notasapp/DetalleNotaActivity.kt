@@ -1,7 +1,6 @@
 package com.sakhura.notasapp
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.sakhura.notasapp.data.NotasManager
 import com.sakhura.notasapp.databinding.ActivityDetalleNotaBinding
@@ -11,7 +10,7 @@ class DetalleNotaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetalleNotaBinding
     private var nota: Nota? = null
-    private var esNuevaNota = false
+    private var notaOriginalVacia = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,14 +20,17 @@ class DetalleNotaActivity : AppCompatActivity() {
         val idNota = intent.getLongExtra("nota_id", -1)
         nota = NotasManager.obtenerNotaPorId(idNota)
 
-        if (nota == null) {
-            // Si no existe, creamos nueva nota (aún no la guardamos)
-            nota = Nota(idNota, "", "")
-            esNuevaNota = true
-        }
+        if (nota != null) {
+            // Verificar si la nota está vacía (recién creada)
+            notaOriginalVacia = nota!!.titulo.isEmpty() && nota!!.contenido.isEmpty()
 
-        binding.etTitulo.setText(nota!!.titulo)
-        binding.etContenido.setText(nota!!.contenido)
+            binding.etTitulo.setText(nota!!.titulo)
+            binding.etContenido.setText(nota!!.contenido)
+        } else {
+            // Si no existe la nota, regresar (no debería pasar con la corrección)
+            finish()
+            return
+        }
 
         binding.btnEliminar.setOnClickListener {
             nota?.let {
@@ -44,16 +46,15 @@ class DetalleNotaActivity : AppCompatActivity() {
         val titulo = binding.etTitulo.text.toString().trim()
         val contenido = binding.etContenido.text.toString().trim()
 
-        if (titulo.isNotEmpty() || contenido.isNotEmpty()) {
-            nota?.apply {
-                this.titulo = titulo
-                this.contenido = contenido
-            }
-
-            if (esNuevaNota) {
-                NotasManager.agregarNota(nota!!)
-            } else {
-                NotasManager.actualizarNota(nota!!)
+        nota?.let { notaActual ->
+            if (titulo.isNotEmpty() || contenido.isNotEmpty()) {
+                // Hay contenido, actualizar la nota
+                notaActual.titulo = titulo
+                notaActual.contenido = contenido
+                NotasManager.actualizarNota(notaActual)
+            } else if (notaOriginalVacia) {
+                // La nota estaba vacía y sigue vacía, eliminarla
+                NotasManager.eliminarNota(notaActual.id)
             }
         }
     }

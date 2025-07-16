@@ -29,9 +29,14 @@ class MainActivity : AppCompatActivity() {
         binding.rvNotas.layoutManager = LinearLayoutManager(this)
         binding.rvNotas.adapter = adapter
 
-        // Botón flotante para crear nueva nota (solo crea Intent)
+        // Botón flotante para crear nueva nota - CORREGIDO
         binding.fabAgregarNota.setOnClickListener {
-            val nuevaNota = Nota(System.currentTimeMillis(), "", "")
+            val nuevaNotaId = System.currentTimeMillis()
+            val nuevaNota = Nota(nuevaNotaId, "", "")
+
+            // Guardar la nota temporal en el manager
+            NotasManager.agregarNota(nuevaNota)
+
             val intent = Intent(this, DetalleNotaActivity::class.java)
             intent.putExtra("nota_id", nuevaNota.id)
             startActivity(intent)

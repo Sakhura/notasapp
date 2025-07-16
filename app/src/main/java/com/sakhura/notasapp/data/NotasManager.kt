@@ -1,6 +1,5 @@
 package com.sakhura.notasapp.data
 
-//import com.sakhura.notasapp.adapter.Nota
 import com.sakhura.notasapp.model.Nota
 
 object NotasManager {
@@ -9,8 +8,8 @@ object NotasManager {
         Nota(System.currentTimeMillis(), "Nota de ejemplo", "Este es el contenido de prueba.")
     )
 
-    // Obtener todas las notas
-    fun obtenerNotas(): List<Nota> = notas
+    // Obtener todas las notas ordenadas por fecha (más recientes primero)
+    fun obtenerNotas(): List<Nota> = notas.sortedByDescending { it.fechaCreacion }
 
     // Agregar una nueva nota
     fun agregarNota(nota: Nota) {
@@ -24,7 +23,10 @@ object NotasManager {
 
     // Buscar notas por título (ignorando mayúsculas)
     fun buscarNotas(query: String): List<Nota> {
-        return notas.filter { it.titulo.contains(query, ignoreCase = true) }
+        return notas.filter {
+            it.titulo.contains(query, ignoreCase = true) ||
+                    it.contenido.contains(query, ignoreCase = true)
+        }.sortedByDescending { it.fechaCreacion }
     }
 
     // Obtener una nota específica por su ID

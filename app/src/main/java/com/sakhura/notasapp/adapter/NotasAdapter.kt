@@ -38,9 +38,12 @@ class NotasAdapter(
             val tvTitulo = itemView.findViewById<TextView>(R.id.tvTitulo)
             val tvFecha = itemView.findViewById<TextView>(R.id.tvFecha)
 
-            tvTitulo.text = nota.titulo
+            // Mostrar el título o "Sin título" si está vacío
+            tvTitulo.text = if (nota.titulo.isNotEmpty()) nota.titulo else "Sin título"
+
+            // Usar el campo fechaCreacion en lugar del id
             val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-            tvFecha.text = sdf.format(Date(nota.id))
+            tvFecha.text = sdf.format(Date(nota.fechaCreacion))
 
             itemView.setOnClickListener {
                 onNotaClick(nota)
