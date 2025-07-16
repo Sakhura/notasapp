@@ -1,65 +1,85 @@
-package com.sakhura.notasapp.data
+package com.sakhura.notasapp
 
+import android.content.Intent
+import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.sakhura.notasapp.adapter.NotasAdapter
+import com.sakhura.notasapp.data.NotasManager
+import com.sakhura.notasapp.databinding.ActivityMainBinding
 import com.sakhura.notasapp.model.Nota
 
-object NotasManager {
-    // Lista de notas en memoria
-    private val notas = mutableListOf(
-        Nota(System.currentTimeMillis(), "Nota de ejemplo", "Este es el contenido de prueba.")
-    )
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: NotasAdapter
 
-    init {
-        Log.d("NotasManager", "NotasManager inicializado con ${notas.size} notas")
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-    // Obtener todas las notas ordenadas por fecha (más recientes primero)
-    fun obtenerNotas(): List<Nota> {
-        val resultado = notas.sortedByDescending { it.fechaCreacion }
-        Log.d("NotasManager", "obtenerNotas() - Devolviendo ${resultado.size} notas")
-        return resultado
-    }
+        Log.d("MainActivity", "onCreate iniciado")
 
-    // Agregar una nueva nota
-    fun agregarNota(nota: Nota) {
-        notas.add(nota)
-        Log.d("NotasManager", "agregarNota() - Nota agregada con ID: ${nota.id}. Total notas: ${notas.size}")
-    }
-
-    // Eliminar una nota por ID
-    fun eliminarNota(id: Long) {
-        val sizeBefore = notas.size
-        notas.removeIf { it.id == id }
-        val sizeAfter = notas.size
-        Log.d("NotasManager", "eliminarNota($id) - Notas antes: $sizeBefore, después: $sizeAfter")
-    }
-
-    // Buscar notas por título (ignorando mayúsculas)
-    fun buscarNotas(query: String): List<Nota> {
-        val resultado = notas.filter {
-            it.titulo.contains(query, ignoreCase = true) ||
-                    it.contenido.contains(query, ignoreCase = true)
-        }.sortedByDescending { it.fechaCreacion }
-
-        Log.d("NotasManager", "buscarNotas('$query') - Encontradas ${resultado.size} notas")
-        return resultado
-    }
-
-    // Obtener una nota específica por su ID
-    fun obtenerNotaPorId(id: Long): Nota? {
-        val resultado = notas.find { it.id == id }
-        Log.d("NotasManager", "obtenerNotaPorId($id) - ${if (resultado != null) "Encontrada" else "NO encontrada"}")
-        return resultado
-    }
-
-    // Actualizar una nota existente
-    fun actualizarNota(nuevaNota: Nota) {
-        val index = notas.indexOfFirst { it.id == nuevaNota.id }
-        if (index != -1) {
-            notas[index] = nuevaNota
-            Log.d("NotasManager", "actualizarNota() - Nota actualizada en índice $index con ID: ${nuevaNota.id}")
-        } else {
-            Log.e("NotasManager", "actualizarNota() - ERROR: No se encontró nota con ID: ${nuevaNota.id}")
+        // Inicializa el adapter con lambda de clic
+        adapter = NotasAdapter { nota ->
+            Log.d("MainActivity", "Clic en nota: ${nota.titulo}")
+            val intent = Intent(this, DetalleNotaActivity::class.java)
+            intent.putExtra("nota_id", nota.id)
+            startActivity(intent)
         }
+
+        // Configura RecyclerView
+        binding.rvNotas.layoutManager = LinearLayoutManager(this)
+        binding.rvNotas.adapter = adapter
+
+        // Botón flotante para crear nueva nota - CON DEBUG
+        binding.fabAgregarNota.setOnClickListener {
+            Log.d("MainActivity", "FAB presionado - Creando nueva nota")
+
+            val nuevaNotaId = System.currentTimeMillis()
+            val nuevaNota = Nota(nuevaNotaId, "", "")
+
+            Log.d("MainActivity", "Nota creada con ID: $nuevaNotaId")
+
+            // Guardar la nota temporal en el manager
+            NotasManager.agregarNota(nuevaNota)
+
+            Log.d("MainActivity", "Nota agregada al manager. Total notas: ${NotasManager.obtenerNotas().size}")
+
+            val intent = Intent(this, DetalleNotaActivity::class.java)
+            intent.putExtra("nota_id", nuevaNota.id)
+
+            Log.d("MainActivity", "Iniciando DetalleNotaActivity con ID: $nuevaNotaId")
+            startActivity(intent)
+        }
+
+        // Configura búsqueda de notas por título
+        binding.searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                val filtradas = NotasManager.buscarNotas(newText.orEmpty())
+                adapter.actualizarNotas(filtradas)
+                return true
+            }
+        })
+
+        Log.d("MainActivity", "onCreate completado")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("MainActivity", "onResume - Actualizando lista")
+
+        val notas = NotasManager.obtenerNotas()
+        Log.d("MainActivity", "Notas encontradas: ${notas.size}")
+
+        notas.forEach { nota ->
+            Log.d("MainActivity", "Nota: ID=${nota.id}, Titulo='${nota.titulo}', Contenido='${nota.contenido}'")
+        }
+
+        // Refresca la lista al volver del detalle
+        adapter.actualizarNotas(notas)
     }
 }

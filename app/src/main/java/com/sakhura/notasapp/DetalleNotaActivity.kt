@@ -2,6 +2,7 @@ package com.sakhura.notasapp
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.sakhura.notasapp.data.NotasManager
 import com.sakhura.notasapp.databinding.ActivityDetalleNotaBinding
@@ -41,11 +42,25 @@ class DetalleNotaActivity : AppCompatActivity() {
             return
         }
 
+        // BOTÓN GUARDAR - NUEVO
+        binding.btnGuardar.setOnClickListener {
+            Log.d("DetalleNota", "Botón guardar presionado")
+            guardarNota()
+
+            // Mostrar mensaje de confirmación
+            Toast.makeText(this, "Nota guardada", Toast.LENGTH_SHORT).show()
+
+            // Regresar a la pantalla principal
+            finish()
+        }
+
+        // BOTÓN ELIMINAR
         binding.btnEliminar.setOnClickListener {
             Log.d("DetalleNota", "Botón eliminar presionado")
             nota?.let {
                 NotasManager.eliminarNota(it.id)
                 Log.d("DetalleNota", "Nota eliminada con ID: ${it.id}")
+                Toast.makeText(this, "Nota eliminada", Toast.LENGTH_SHORT).show()
             }
             finish()
         }
@@ -53,14 +68,12 @@ class DetalleNotaActivity : AppCompatActivity() {
         Log.d("DetalleNota", "onCreate completado")
     }
 
-    override fun onPause() {
-        super.onPause()
-        Log.d("DetalleNota", "onPause iniciado")
-
+    // FUNCIÓN PARA GUARDAR LA NOTA
+    private fun guardarNota() {
         val titulo = binding.etTitulo.text.toString().trim()
         val contenido = binding.etContenido.text.toString().trim()
 
-        Log.d("DetalleNota", "Texto capturado - Título: '$titulo', Contenido: '$contenido'")
+        Log.d("DetalleNota", "Guardando nota - Título: '$titulo', Contenido: '$contenido'")
 
         nota?.let { notaActual ->
             if (titulo.isNotEmpty() || contenido.isNotEmpty()) {
@@ -75,11 +88,16 @@ class DetalleNotaActivity : AppCompatActivity() {
                 // La nota estaba vacía y sigue vacía, eliminarla
                 NotasManager.eliminarNota(notaActual.id)
                 Log.d("DetalleNota", "Nota vacía eliminada con ID: ${notaActual.id}")
-            } else {
-                Log.d("DetalleNota", "Nota se quedó vacía pero no era original vacía")
             }
         }
+    }
 
+    // MANTENER LA FUNCIONALIDAD DEL BOTÓN ATRÁS
+    override fun onPause() {
+        super.onPause()
+        Log.d("DetalleNota", "onPause - guardado automático")
+        // Solo guardar automáticamente si no se usó el botón guardar
+        guardarNota()
         Log.d("DetalleNota", "onPause completado")
     }
 }
