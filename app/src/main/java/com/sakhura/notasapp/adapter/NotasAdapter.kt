@@ -11,12 +11,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class NotasAdapter(
-    private var notas: List<Nota>,
     private val onNotaClick: (Nota) -> Unit
 ) : RecyclerView.Adapter<NotasAdapter.NotaViewHolder>() {
 
+    private val notas = mutableListOf<Nota>()
+
     fun actualizarNotas(nuevasNotas: List<Nota>) {
-        this.notas = nuevasNotas
+        notas.clear()
+        notas.addAll(nuevasNotas)
         notifyDataSetChanged()
     }
 

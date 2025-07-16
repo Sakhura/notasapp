@@ -1,47 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_detalle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".DetalleNotaActivity">
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/etTitulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:hint="Título"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:background="@android:color/transparent"
+        android:padding="8dp" />
 
-        <!-- Campo para el título de la nota -->
-        <EditText
-            android:id="@+id/etTitulo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/titulo"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:inputType="textCapSentences"
-            android:paddingBottom="8dp" />
+    <EditText
+        android:id="@+id/etContenido"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:hint="Contenido"
+        android:gravity="top"
+        android:background="@android:color/transparent"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:inputType="textMultiLine"
+        android:overScrollMode="ifContentScrolls" />
 
-        <!-- Campo para el contenido de la nota -->
-        <EditText
-            android:id="@+id/etContenido"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:hint="@string/contenido"
-            android:textSize="16sp"
-            android:inputType="textMultiLine"
-            android:gravity="top"
-            android:background="@android:color/transparent"
-            android:padding="8dp"
-            android:scrollbars="vertical" />
-
-        <!-- Botón para eliminar -->
-        <Button
-            android:id="@+id/btnEliminar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/eliminar"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="@color/purple_700"
-            android:textColor="@android:color/white" />
-
-    </LinearLayout>
-</ScrollView>
+    <Button
+        android:id="@+id/btnEliminar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Eliminar Nota"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/holo_red_light"
+        android:layout_marginTop="8dp" />
+</LinearLayout>

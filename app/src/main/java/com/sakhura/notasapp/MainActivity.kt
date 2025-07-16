@@ -18,25 +18,29 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        adapter = NotasAdapter(NotasManager.obtenerNotas()) { nota ->
+        // Inicializa el adapter con lambda de clic
+        adapter = NotasAdapter { nota ->
             val intent = Intent(this, DetalleNotaActivity::class.java)
             intent.putExtra("nota_id", nota.id)
             startActivity(intent)
         }
 
+        // Configura RecyclerView
         binding.rvNotas.layoutManager = LinearLayoutManager(this)
         binding.rvNotas.adapter = adapter
 
+        // Botón flotante para crear nueva nota (solo crea Intent)
         binding.fabAgregarNota.setOnClickListener {
             val nuevaNota = Nota(System.currentTimeMillis(), "", "")
-            NotasManager.agregarNota(nuevaNota)
             val intent = Intent(this, DetalleNotaActivity::class.java)
             intent.putExtra("nota_id", nuevaNota.id)
             startActivity(intent)
         }
 
+        // Configura búsqueda de notas por título
         binding.searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 val filtradas = NotasManager.buscarNotas(newText.orEmpty())
                 adapter.actualizarNotas(filtradas)
@@ -47,6 +51,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Refresca la lista al volver del detalle
         adapter.actualizarNotas(NotasManager.obtenerNotas())
     }
 }
