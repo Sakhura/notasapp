@@ -1,35 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <EditText
-        android:id="@+id/etTitulo"
-        android:hint="Título"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <EditText
-        android:id="@+id/etContenido"
-        android:hint="Escribe tu nota..."
-        android:layout_marginTop="12dp"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="top"
-        android:inputType="textMultiLine"
-        android:textSize="16sp"/>
-
-    <Button
-        android:id="@+id/btnEliminar"
-        android:text="Eliminar Nota"
-        android:layout_marginTop="16dp"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#B00020"
-        android:textColor="@android:color/white"/>
-</LinearLayout>
+        android:orientation="vertical">
+
+        <!-- Campo para el título de la nota -->
+        <EditText
+            android:id="@+id/etTitulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/titulo"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:inputType="textCapSentences"
+            android:paddingBottom="8dp" />
+
+        <!-- Campo para el contenido de la nota -->
+        <EditText
+            android:id="@+id/etContenido"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:hint="@string/contenido"
+            android:textSize="16sp"
+            android:inputType="textMultiLine"
+            android:gravity="top"
+            android:background="@android:color/transparent"
+            android:padding="8dp"
+            android:scrollbars="vertical" />
+
+        <!-- Botón para eliminar -->
+        <Button
+            android:id="@+id/btnEliminar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/eliminar"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/purple_700"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+</ScrollView>

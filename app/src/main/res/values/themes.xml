@@ -1,9 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Notasapp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <!-- Tema de la aplicación -->
+    <style name="Theme.Notasapp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Colores -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+
+        <!-- Fondo y superficie -->
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorOnBackground">@color/colorOnBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+
+        <!-- Fuente predeterminada -->
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/gray_dark</item>
+
+        <!-- Botón flotante, Toolbar, etc. -->
+        <item name="floatingActionButtonStyle">@style/Widget.MaterialComponents.FloatingActionButton</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar</item>
     </style>
 
-    <style name="Theme.Notasapp" parent="Base.Theme.Notasapp" />
 </resources>

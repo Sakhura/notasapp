@@ -3,6 +3,7 @@ package com.sakhura.notasapp
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+// import com.sakhura.notasapp.adapter.Nota
 import com.sakhura.notasapp.data.NotasManager
 import com.sakhura.notasapp.databinding.ActivityDetalleNotaBinding
 import com.sakhura.notasapp.model.Nota

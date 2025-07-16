@@ -10,7 +10,6 @@ import com.sakhura.notasapp.databinding.ActivityMainBinding
 import com.sakhura.notasapp.model.Nota
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: NotasAdapter
 
@@ -19,16 +18,35 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val searchView = findViewById<androidx.appcompat.widget.SearchView>(R.id.searchView)
+        adapter = NotasAdapter(NotasManager.obtenerNotas()) { nota ->
+            val intent = Intent(this, DetalleNotaActivity::class.java)
+            intent.putExtra("nota_id", nota.id)
+            startActivity(intent)
+        }
 
-        searchView.setOnQueryTextListener(object :
-            androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?) = false
+        binding.rvNotas.layoutManager = LinearLayoutManager(this)
+        binding.rvNotas.adapter = adapter
+
+        binding.fabAgregarNota.setOnClickListener {
+            val nuevaNota = Nota(System.currentTimeMillis(), "", "")
+            NotasManager.agregarNota(nuevaNota)
+            val intent = Intent(this, DetalleNotaActivity::class.java)
+            intent.putExtra("nota_id", nuevaNota.id)
+            startActivity(intent)
+        }
+
+        binding.searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
                 val filtradas = NotasManager.buscarNotas(newText.orEmpty())
                 adapter.actualizarNotas(filtradas)
                 return true
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adapter.actualizarNotas(NotasManager.obtenerNotas())
     }
 }
